@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { isLoggedIn } from './lib/auth';
-import AuthForm from './components/AuthForm';
-import Dashboard from './components/Dashboard';
-import ToastContainer from './components/Toast';
+import { isLoggedIn } from './domains/auth/auth';
+import AuthForm from './domains/auth/AuthForm';
+import Dashboard from './domains/notes/Dashboard';
+import ToastContainer from './shared/Toast';
 
 export default function Home() {
   const [authenticated, setAuthenticated] = useState(false);

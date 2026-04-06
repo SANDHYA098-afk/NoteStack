@@ -27,7 +27,25 @@
       "Bash(powershell -Command \"Get-Process -Id \\(Get-NetTCPConnection -LocalPort 3000\\).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force\")",
       "Bash(powershell -Command \"Stop-Process -Name node -Force -ErrorAction SilentlyContinue\")",
       "Bash(aws logs:*)",
-      "Bash(aws iam:*)"
+      "Bash(aws iam:*)",
+      "Bash(mkdir -p domains/notes/lambdas/CreateNote)",
+      "Bash(mkdir -p domains/notes/lambdas/GetNotes)",
+      "Bash(mkdir -p domains/notes/lambdas/UpdateNote)",
+      "Bash(mkdir -p domains/notes/lambdas/DeleteNote)",
+      "Bash(mkdir -p domains/notes/lambdas/SearchNotes)",
+      "Bash(mkdir -p domains/auth)",
+      "Bash(mkdir -p domains/notes)",
+      "Bash(mkdir -p domains/files)",
+      "Bash(mkdir -p domains/sharing)",
+      "Bash(mkdir -p domains/notifications)",
+      "Bash(cp components/Toast.tsx shared/Toast.tsx)",
+      "Bash(cp components/Modal.tsx shared/Modal.tsx)",
+      "Bash(cp components/PasswordInput.tsx shared/PasswordInput.tsx)",
+      "Bash(cp components/ProfileSection.tsx shared/ProfileSection.tsx)",
+      "Bash(rm -rf lambda/)",
+      "Bash(rm -rf aws-setup/)",
+      "Bash(rm -rf frontend/app/components/)",
+      "Bash(rm -rf frontend/app/lib/)"
     ]
   }
 }

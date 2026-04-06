@@ -1,0 +1,12 @@
+[
+  {
+    "Create": {
+      "IndexName": "CategoryIndex",
+      "KeySchema": [
+        {"AttributeName": "userId", "KeyType": "HASH"},
+        {"AttributeName": "category", "KeyType": "RANGE"}
+      ],
+      "Projection": {"ProjectionType": "ALL"}
+    }
+  }
+]

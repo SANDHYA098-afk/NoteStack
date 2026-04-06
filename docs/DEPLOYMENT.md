@@ -141,21 +141,36 @@ https://main.xxxx.amplifyapp.com
 
 ## Updating Lambda Functions After Code Changes
 
-If you modify any Lambda function code:
+If you modify any Lambda function code (DDD structure):
 
 ```bash
-cd lambda
+# Example: update CreateNote (in domains/notes/lambdas/CreateNote/)
+cd domains/notes/lambdas/CreateNote
 
-# Rebuild the zip (example: CreateNote)
-cp shared/utils.mjs CreateNote/utils.mjs
-sed 's|../shared/utils.mjs|./utils.mjs|g' CreateNote/index.mjs > CreateNote/index_deploy.mjs
-powershell -Command "Compress-Archive -Path 'CreateNote/index_deploy.mjs','CreateNote/utils.mjs' -DestinationPath 'CreateNote.zip' -Force"
+# Copy shared utils and fix import
+cp ../../../../shared/utils.mjs ./utils.mjs
+sed 's|../../../../shared/utils.mjs|./utils.mjs|g' index.mjs > index_deploy.mjs
 
-# Upload
-aws lambda update-function-code --function-name NoteStack-CreateNote --zip-file fileb://CreateNote.zip --region ap-south-1
+# Zip and deploy
+powershell -Command "Compress-Archive -Path 'index_deploy.mjs','utils.mjs' -DestinationPath 'NoteStack-CreateNote.zip' -Force"
+aws lambda update-function-code --function-name NoteStack-CreateNote --zip-file fileb://NoteStack-CreateNote.zip --region ap-south-1
+
+# Clean up
+rm -f utils.mjs index_deploy.mjs NoteStack-CreateNote.zip
 ```
 
-Repeat for any changed function.
+Domain → Lambda name mapping:
+- `domains/notes/lambdas/CreateNote/` → `NoteStack-CreateNote`
+- `domains/notes/lambdas/GetNotes/` → `NoteStack-GetNotes`
+- `domains/notes/lambdas/UpdateNote/` → `NoteStack-UpdateNote`
+- `domains/notes/lambdas/DeleteNote/` → `NoteStack-DeleteNote`
+- `domains/notes/lambdas/SearchNotes/` → `NoteStack-SearchNotes`
+- `domains/files/lambdas/GenerateUploadUrl/` → `NoteStack-GenerateUploadUrl`
+- `domains/files/lambdas/GenerateDownloadUrl/` → `NoteStack-GenerateDownloadUrl`
+- `domains/sharing/lambdas/ShareNote/` → `NoteStack-ShareNote`
+- `domains/notifications/lambdas/GetNotifications/` → `NoteStack-GetNotifications`
+- `domains/notifications/lambdas/MarkNotificationRead/` → `NoteStack-MarkNotificationRead`
+- `domains/cleanup/lambdas/AutoDeleteOldNotes/` → `NoteStack-AutoDeleteOldNotes`
 
 ---
 
