@@ -22,7 +22,7 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [category, setCategory] = useState('');
   const [showShared, setShowShared] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchTimer = useRef<ReturnType<typeof setTimeout>>();
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
