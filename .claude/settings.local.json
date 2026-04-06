@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(aws --version)",
+      "Bash(aws lambda:*)",
+      "Bash(aws apigateway:*)",
+      "Bash(cp shared/utils.mjs ShareNote/utils.mjs)",
+      "Bash(sed 's|../shared/utils.mjs|./utils.mjs|g' ShareNote/index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'ShareNote/index_deploy.mjs','ShareNote/utils.mjs' -DestinationPath 'ShareNote.zip' -Force\")",
+      "Bash(start \"\" \"c:/Users/Admin/Desktop/NoteStack/frontend/index.html\")",
+      "Bash(cp shared/utils.mjs GenerateDownloadUrl/utils.mjs)",
+      "Bash(sed 's|../shared/utils.mjs|./utils.mjs|g' GenerateDownloadUrl/index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'GenerateDownloadUrl/index_deploy.mjs','GenerateDownloadUrl/utils.mjs' -DestinationPath 'GenerateDownloadUrl.zip' -Force\")",
+      "Bash(aws dynamodb:*)",
+      "Bash(cp shared/utils.mjs GetNotifications/utils.mjs)",
+      "Bash(sed 's|../shared/utils.mjs|./utils.mjs|g' GetNotifications/index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'GetNotifications/index_deploy.mjs','GetNotifications/utils.mjs' -DestinationPath 'GetNotifications.zip' -Force\")",
+      "Bash(cp shared/utils.mjs MarkNotificationRead/utils.mjs)",
+      "Bash(sed 's|../shared/utils.mjs|./utils.mjs|g' MarkNotificationRead/index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'MarkNotificationRead/index_deploy.mjs','MarkNotificationRead/utils.mjs' -DestinationPath 'MarkNotificationRead.zip' -Force\")",
+      "Bash(cp shared/utils.mjs CreateNote/utils.mjs)",
+      "Bash(sed 's|../shared/utils.mjs|./utils.mjs|g' CreateNote/index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'CreateNote/index_deploy.mjs','CreateNote/utils.mjs' -DestinationPath 'CreateNote.zip' -Force\")",
+      "mcp__claude_ai_Context7__resolve-library-id",
+      "mcp__claude_ai_Context7__query-docs",
+      "Bash(npx next:*)",
+      "Bash(powershell -Command \"Get-Process -Id \\(Get-NetTCPConnection -LocalPort 3000\\).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(powershell -Command \"Stop-Process -Name node -Force -ErrorAction SilentlyContinue\")",
+      "Bash(aws logs:*)",
+      "Bash(aws iam:*)"
+    ]
+  }
+}
