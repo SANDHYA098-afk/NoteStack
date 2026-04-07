@@ -51,7 +51,9 @@
       "Bash(sed 's|../../../../shared/utils.mjs|./utils.mjs|g' index.mjs)",
       "Bash(powershell -Command \"Compress-Archive -Path 'index_deploy.mjs','utils.mjs' -DestinationPath 'NoteStack-GetAllNotes.zip' -Force\")",
       "Bash(rm -f utils.mjs index_deploy.mjs NoteStack-GetAllNotes.zip)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://019vhyfrah.execute-api.ap-south-1.amazonaws.com/dev/notes/feed\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://019vhyfrah.execute-api.ap-south-1.amazonaws.com/dev/notes/feed\")",
+      "Bash(sed -i 's/{ size = d.size, className = d.className }: IconProps/{ size = d.size, className = d.className, style = d.style }: IconProps/g' Icons.tsx)",
+      "Bash(sed -i 's/className={className}>/className={className} style={style}>/g' Icons.tsx)"
     ]
   }
 }
