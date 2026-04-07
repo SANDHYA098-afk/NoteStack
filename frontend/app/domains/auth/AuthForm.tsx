@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signUp, confirmSignUp, login as authLogin } from './auth';
 import { showToast } from '../../shared/Toast';
 import PasswordInput from '../../shared/PasswordInput';
+import { IconNotes } from '../../shared/icons/Icons';
 
 type Step = 'login' | 'signup' | 'verify';
 
@@ -25,11 +26,8 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       await signUp(email, password);
       showToast('Check your email for the code!', 'success');
       setStep('verify');
-    } catch (err: unknown) {
-      showToast((err as Error).message, 'error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: unknown) { showToast((err as Error).message, 'error'); }
+    finally { setLoading(false); }
   }
 
   async function handleVerify(e: React.FormEvent) {
@@ -40,11 +38,8 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       showToast('Verified! Logging you in...', 'success');
       await authLogin(email, password);
       onLogin();
-    } catch (err: unknown) {
-      showToast((err as Error).message, 'error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: unknown) { showToast((err as Error).message, 'error'); }
+    finally { setLoading(false); }
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -52,88 +47,106 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
     setLoading(true);
     try {
       await authLogin(email, password);
-      showToast('Welcome back! ✨', 'success');
       onLogin();
-    } catch (err: unknown) {
-      showToast((err as Error).message, 'error');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: unknown) { showToast((err as Error).message, 'error'); }
+    finally { setLoading(false); }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 animate-fade-in relative overflow-hidden">
-      {/* Floating doodle decorations — hidden on mobile */}
-      <svg className="hidden sm:block absolute top-20 left-16 w-16 h-16 opacity-70 animate-float" viewBox="0 0 100 100" fill="none" stroke="#ff6b9d" strokeWidth="3">
-        <circle cx="50" cy="50" r="40" strokeDasharray="8 8" /><path d="M35 50 L45 60 L65 40" />
-      </svg>
-      <svg className="hidden sm:block absolute top-32 right-20 w-12 h-12 opacity-70 animate-float" style={{ animationDelay: '1s' }} viewBox="0 0 50 50" fill="none" stroke="#4ecdc4" strokeWidth="3">
-        <path d="M10 25 Q25 5 40 25 Q25 45 10 25Z" />
-      </svg>
-      <svg className="hidden sm:block absolute bottom-24 left-24 w-20 h-20 opacity-50 animate-float" style={{ animationDelay: '2s' }} viewBox="0 0 80 80" fill="none" stroke="#e6c800" strokeWidth="2.5">
-        <path d="M40 10 L50 30 L70 30 L55 45 L60 65 L40 55 L20 65 L25 45 L10 30 L30 30Z" />
-      </svg>
-      <svg className="hidden sm:block absolute bottom-40 right-16 w-10 h-10 opacity-80 animate-float" style={{ animationDelay: '0.5s' }} viewBox="0 0 40 40" fill="#a8e06c">
-        <path d="M20 5 L23 15 L33 15 L25 22 L28 32 L20 26 L12 32 L15 22 L7 15 L17 15Z" />
-      </svg>
-      <svg className="hidden sm:block absolute top-48 right-1/3 w-8 h-8 opacity-60 animate-float" style={{ animationDelay: '1.5s' }} viewBox="0 0 32 32" fill="#b57bee">
-        <circle cx="16" cy="16" r="12" />
-      </svg>
-      <svg className="hidden sm:block absolute bottom-32 left-1/3 w-6 h-6 opacity-50 animate-float" style={{ animationDelay: '0.8s' }} viewBox="0 0 24 24" fill="#ff8a5c">
-        <rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(15 12 12)" />
-      </svg>
-      <svg className="hidden sm:block absolute top-1/4 left-0 w-full h-8 opacity-20" viewBox="0 0 800 30" fill="none" stroke="#ff6b9d" strokeWidth="2">
-        <path d="M0 15 Q50 0 100 15 Q150 30 200 15 Q250 0 300 15 Q350 30 400 15 Q450 0 500 15 Q550 30 600 15 Q650 0 700 15 Q750 30 800 15" />
-      </svg>
-      <svg className="hidden sm:block absolute bottom-1/4 left-0 w-full h-8 opacity-15" viewBox="0 0 800 30" fill="none" stroke="#4ecdc4" strokeWidth="2">
-        <path d="M0 15 Q50 30 100 15 Q150 0 200 15 Q250 30 300 15 Q350 0 400 15 Q450 30 500 15 Q550 0 600 15 Q650 30 700 15 Q750 0 800 15" />
-      </svg>
+    <div className="min-h-screen flex flex-col lg:flex-row animate-fade-in relative overflow-hidden">
+      {/* Floating doodles — visible on ALL screen sizes */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+        <svg className="absolute top-6 right-6 w-10 h-10 sm:w-12 sm:h-12 animate-float" style={{ opacity: 0.2 }} viewBox="0 0 50 50" fill="none" stroke="#7bc043" strokeWidth="2.5">
+          <path d="M25 5 L28 18 L42 18 L31 27 L35 40 L25 32 L15 40 L19 27 L8 18 L22 18Z" />
+        </svg>
+        <svg className="absolute top-20 left-4 sm:left-8 w-8 h-8 animate-float" style={{ opacity: 0.25, animationDelay: '1s' }} viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8" fill="#4ecdc4" />
+        </svg>
+        <svg className="absolute bottom-32 right-8 w-14 h-14 sm:w-16 sm:h-16 animate-float" style={{ opacity: 0.12, animationDelay: '1.5s' }} viewBox="0 0 60 60" fill="none" stroke="#4ecdc4" strokeWidth="2.5" strokeDasharray="6 6">
+          <circle cx="30" cy="30" r="24" />
+        </svg>
+        <svg className="absolute bottom-20 left-6 w-8 h-8 animate-float" style={{ opacity: 0.2, animationDelay: '2s' }} viewBox="0 0 40 40">
+          <rect x="8" y="8" width="24" height="24" rx="3" fill="#ffe156" fillOpacity="0.5" stroke="#e6c800" strokeWidth="2" transform="rotate(15 20 20)" />
+        </svg>
+        <svg className="absolute top-1/2 right-4 w-5 h-5 animate-float" style={{ opacity: 0.3, animationDelay: '0.5s' }} viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="7" fill="#5a9e2f" />
+        </svg>
+        <svg className="absolute top-[35%] left-[15%] w-6 h-6 animate-float" style={{ opacity: 0.15, animationDelay: '2.5s' }} viewBox="0 0 24 24" fill="none" stroke="#ff8a5c" strokeWidth="3" strokeLinecap="round">
+          <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+        {/* Wavy line */}
+        <svg className="absolute top-[15%] left-0 w-full h-6" style={{ opacity: 0.06 }} viewBox="0 0 800 20" fill="none" stroke="#7bc043" strokeWidth="2">
+          <path d="M0 10 Q50 0 100 10 Q150 20 200 10 Q250 0 300 10 Q350 20 400 10 Q450 0 500 10 Q550 20 600 10 Q650 0 700 10 Q750 20 800 10" />
+        </svg>
+        <svg className="absolute bottom-[12%] left-0 w-full h-6" style={{ opacity: 0.05 }} viewBox="0 0 800 20" fill="none" stroke="#4ecdc4" strokeWidth="2">
+          <path d="M0 10 Q50 20 100 10 Q150 0 200 10 Q250 20 300 10 Q350 0 400 10 Q450 20 500 10 Q550 0 600 10 Q650 20 700 10 Q750 0 800 10" />
+        </svg>
+      </div>
 
-      <div className="w-full max-w-[460px] animate-fade-up px-2 sm:px-0">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-block mb-3 relative">
-            <div className="w-16 h-16 bg-[var(--yellow)] border-[2.5px] border-[var(--border)] flex items-center justify-center mx-auto" style={{ borderRadius: '8px 4px 12px 2px', boxShadow: 'var(--shadow)' }}>
-              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M8 4 L8 28" /><path d="M8 4 L24 4 Q26 4 26 6 L26 12 Q26 14 24 14 L8 14" />
-                <path d="M8 14 L22 14 Q24 14 24 16 L24 26 Q24 28 22 28 L8 28" />
-                <path d="M12 9 L22 9" /><path d="M12 19 L20 19" /><path d="M12 23 L18 23" />
-              </svg>
-            </div>
-            <svg className="absolute -top-2 -right-4 w-6 h-6 text-[var(--pink)]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L14 9L21 12L14 15L12 22L10 15L3 12L10 9Z" />
-            </svg>
-          </div>
-          <h1 className="text-5xl tracking-tight mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700 }}>NoteStack</h1>
-          <p className="text-lg" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-light)' }}>notes for students, by students ~</p>
+      {/* Top section on mobile / Left side on desktop — Branding + Illustration */}
+      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-10 lg:py-0 lg:w-[45%] xl:w-[50%]" style={{ background: 'var(--bg)' }}>
+        {/* Illustration */}
+        <div className="w-40 h-40 sm:w-56 sm:h-56 lg:w-72 lg:h-72 xl:w-96 xl:h-96 animate-fade-up">
+          <img src="/book.webp" alt="NoteStack" className="w-full h-full object-contain drop-shadow-xl dark-hidden" />
+          <img src="/bookimg.png" alt="NoteStack" className="w-full h-full object-contain drop-shadow-xl hidden dark-visible" />
         </div>
 
-        {/* Card */}
-        <div className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-8 relative" style={{ borderRadius: '8px 16px 6px 20px', boxShadow: '6px 6px 0px var(--border)' }}>
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-[var(--yellow)] border-[1.5px] border-[var(--border)] opacity-80" style={{ borderRadius: '2px', transform: 'translateX(-50%) rotate(-2deg)' }} />
+        {/* Branding */}
+        <div className="text-center mt-4 lg:mt-8 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700 }}>
+            <span style={{ color: 'var(--accent)' }}>Note</span><span style={{ color: 'var(--ink)' }}>Stack</span>
+          </h1>
+          <p className="text-base sm:text-lg max-w-sm mx-auto" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink-light)' }}>
+            Share notes, discover knowledge, learn together.
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom section on mobile / Right side on desktop — Form */}
+      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-8 lg:py-12" style={{ background: 'var(--bg-card)' }}>
+        <div className="w-full max-w-[420px] animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          {/* Context heading */}
+          <div className="mb-6">
+            <h2 className="text-3xl sm:text-4xl mb-1" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, color: 'var(--ink)' }}>
+              {step === 'verify' ? 'Almost there!' : step === 'signup' ? 'Join NoteStack' : 'Welcome back'}
+            </h2>
+            <p className="text-sm sm:text-base" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>
+              {step === 'verify' ? `Enter the code we sent to ${email}` : step === 'signup' ? 'Create your account to start sharing' : 'Sign in to continue'}
+            </p>
+          </div>
 
           {step === 'verify' ? (
-            <form onSubmit={handleVerify} className="animate-fade-up">
-              <div className="text-center mb-6">
-                <span className="text-4xl">📬</span>
-                <h2 className="text-2xl mt-2 mb-1" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Check your inbox!</h2>
-                <p className="text-sm" style={{ color: 'var(--ink-light)' }}>We sent a code to <strong>{email}</strong></p>
+            <form onSubmit={handleVerify} className="animate-fade-up space-y-5">
+              <div>
+                <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)' }}>Verification Code</label>
+                <input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Enter 6-digit code" required className="doodle-input text-center text-xl tracking-[0.3em]" maxLength={6} />
               </div>
-              <div className="mb-4">
-                <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600 }}>Verification Code</label>
-                <input type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Enter the 6-digit code" required className="doodle-input text-center text-xl tracking-[0.3em]" maxLength={6} />
-              </div>
-              <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">{loading ? 'Verifying...' : 'Verify & Login ✨'}</button>
-              <button type="button" onClick={() => setStep('signup')} className="w-full text-center text-sm mt-4 underline" style={{ color: 'var(--ink-light)' }}>Go back</button>
+              <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">
+                {loading ? 'Verifying...' : 'Verify & Login'}
+              </button>
+              <button type="button" onClick={() => setStep('signup')} className="w-full text-center text-sm underline" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>
+                Go back
+              </button>
             </form>
           ) : (
             <>
-              <div className="flex gap-2 mb-8">
+              {/* Tabs */}
+              <div className="flex gap-2 mb-6">
                 {(['login', 'signup'] as const).map(t => (
-                  <button key={t} onClick={() => setStep(t)}
-                    className={`flex-1 py-2.5 text-lg border-[2px] border-[var(--border)] transition-all ${step === t ? 'bg-[var(--yellow)] shadow-[var(--shadow-sm)]' : 'bg-[var(--bg-card)] hover:bg-[var(--yellow)]/20'}`}
-                    style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, borderRadius: t === 'login' ? '6px 2px 4px 8px' : '2px 8px 6px 4px' }}>
-                    {t === 'login' ? '🔑 Login' : '✏️ Sign Up'}
+                  <button
+                    key={t}
+                    onClick={() => setStep(t)}
+                    className={`flex-1 py-3 text-lg border-[2.5px] border-[var(--border)] transition-all active:translate-y-[1px] active:shadow-none ${
+                      step === t
+                        ? 'bg-[var(--accent-light)] shadow-[var(--shadow-sm)] border-[var(--accent)] translate-x-[-1px] translate-y-[-1px]'
+                        : 'bg-[var(--bg)] hover:bg-[var(--accent-light)]'
+                    }`}
+                    style={{
+                      fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)',
+                      borderRadius: t === 'login' ? '8px 2px 4px 10px' : '2px 10px 8px 4px',
+                    }}
+                  >
+                    {t === 'login' ? 'Login' : 'Sign Up'}
                   </button>
                 ))}
               </div>
@@ -141,34 +154,41 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
               {step === 'login' && (
                 <form onSubmit={handleLogin} className="space-y-5 animate-fade-up">
                   <div>
-                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600 }}>Email</label>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)' }}>Email</label>
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@university.edu" required className="doodle-input" />
                   </div>
                   <div>
-                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600 }}>Password</label>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)' }}>Password</label>
                     <PasswordInput value={password} onChange={e => setPassword(e.target.value)} placeholder="your secret password" required />
                   </div>
-                  <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">{loading ? 'Signing in...' : 'Let me in! →'}</button>
+                  <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">
+                    {loading ? 'Signing in...' : 'Login'}
+                  </button>
                 </form>
               )}
 
               {step === 'signup' && (
                 <form onSubmit={handleSignUp} className="space-y-5 animate-fade-up">
                   <div>
-                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600 }}>Email</label>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)' }}>Email</label>
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@university.edu" required className="doodle-input" />
                   </div>
                   <div>
-                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600 }}>Password</label>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-hand)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)' }}>Password</label>
                     <PasswordInput value={password} onChange={e => setPassword(e.target.value)} placeholder="8+ chars, uppercase, number, symbol" required minLength={8} />
                   </div>
-                  <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">{loading ? 'Creating...' : 'Create Account ✨'}</button>
+                  <button disabled={loading} className="btn-doodle btn-primary w-full text-lg">
+                    {loading ? 'Creating...' : 'Create Account'}
+                  </button>
                 </form>
               )}
+
+              <p className="text-center text-xs mt-6" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>
+                Powered by AWS Lambda, DynamoDB & Cognito
+              </p>
             </>
           )}
         </div>
-        <p className="text-center text-sm mt-6" style={{ color: 'var(--ink-light)' }}>⚡ powered by AWS Lambda, DynamoDB & Cognito</p>
       </div>
     </div>
   );

@@ -11,6 +11,15 @@ export interface Note {
   updatedAt: string;
   isShared?: boolean;
   sharedByUserId?: string;
+  authorEmail?: string;
+}
+
+export async function getFeedNotes(category?: string, query?: string) {
+  const params = [];
+  if (category) params.push(`category=${encodeURIComponent(category)}`);
+  if (query) params.push(`q=${encodeURIComponent(query)}`);
+  const qs = params.length > 0 ? "?" + params.join("&") : "";
+  return apiCall("GET", `/notes/feed${qs}`);
 }
 
 export async function getNotes(category?: string, includeShared?: boolean) {

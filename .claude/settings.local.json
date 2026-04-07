@@ -45,7 +45,13 @@
       "Bash(rm -rf lambda/)",
       "Bash(rm -rf aws-setup/)",
       "Bash(rm -rf frontend/app/components/)",
-      "Bash(rm -rf frontend/app/lib/)"
+      "Bash(rm -rf frontend/app/lib/)",
+      "Bash(export MSYS_NO_PATHCONV=1)",
+      "Bash(cp ../../../../shared/utils.mjs ./utils.mjs)",
+      "Bash(sed 's|../../../../shared/utils.mjs|./utils.mjs|g' index.mjs)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'index_deploy.mjs','utils.mjs' -DestinationPath 'NoteStack-GetAllNotes.zip' -Force\")",
+      "Bash(rm -f utils.mjs index_deploy.mjs NoteStack-GetAllNotes.zip)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://019vhyfrah.execute-api.ap-south-1.amazonaws.com/dev/notes/feed\")"
     ]
   }
 }

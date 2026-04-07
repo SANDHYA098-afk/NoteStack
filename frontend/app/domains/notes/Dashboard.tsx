@@ -1,28 +1,27 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { logout as authLogout } from '../auth/auth';
-import { getNotes, createNote, updateNote, deleteNote, searchNotes, type Note } from './api';
+import { getNotes, getFeedNotes, createNote, updateNote, deleteNote, searchNotes, type Note } from './api';
 import { getUploadUrl, getDownloadUrl } from '../files/api';
 import { CATEGORIES } from '../../shared/config';
 import { showToast } from '../../shared/Toast';
 import Modal from '../../shared/Modal';
-import ProfileSection from '../../shared/ProfileSection';
-import NotificationBell from '../notifications/NotificationBell';
 import ShareModal from '../sharing/ShareModal';
-import NoteCard from './NoteCard';
+import { IconPlus, IconX, IconSearch, IconTag, IconEdit, IconTrash, IconShare, IconDownload, IconFile, IconClock, IconStar, IconBookmark } from '../../shared/icons/Icons';
 
-const catEmoji: Record<string, string> = {
-  general: '📝', lecture: '🎓', assignment: '📋', exam: '🧪', project: '🚀', personal: '💭',
-};
+interface DashboardProps {
+  onLogout: () => void;
+  forceNewNote?: boolean;
+  onNewNoteShown?: () => void;
+}
 
-export default function Dashboard({ onLogout }: { onLogout: () => void }) {
+export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: DashboardProps) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
-  const [showShared, setShowShared] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [starred, setStarred] = useState<Set<string>>(new Set());
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -37,14 +36,44 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
 
-  useEffect(() => { loadNotes(); }, [category, showShared]);
+  useEffect(() => {
+    const saved = localStorage.getItem('notestack-starred');
+    if (saved) setStarred(new Set(JSON.parse(saved)));
+  }, []);
+
+  useEffect(() => { loadNotes(); }, [category, showStarredOnly]);
+
+  useEffect(() => {
+    if (forceNewNote) { setFormOpen(true); onNewNoteShown?.(); }
+  }, [forceNewNote, onNewNoteShown]);
+
+  function toggleStar(noteId: string) {
+    setStarred(prev => {
+      const next = new Set(prev);
+      if (next.has(noteId)) next.delete(noteId); else next.add(noteId);
+      localStorage.setItem('notestack-starred', JSON.stringify([...next]));
+      // If in starred view and unstarring, remove from display
+      if (showStarredOnly && prev.has(noteId)) {
+        setNotes(notes.filter(n => n.noteId !== noteId));
+      }
+      return next;
+    });
+  }
 
   async function loadNotes() {
     setLoading(true);
     try {
-      const data = await getNotes(category || undefined, showShared);
-      setNotes(data.notes);
+      if (showStarredOnly) {
+        // Fetch from community feed to get ALL starred notes (not just yours)
+        const data = await getFeedNotes(category || undefined);
+        const starredNotes = (data.notes || []).filter((n: Note) => starred.has(n.noteId));
+        setNotes(starredNotes);
+      } else {
+        const data = await getNotes(category || undefined, true);
+        setNotes(data.notes);
+      }
     } catch (err: unknown) { showToast((err as Error).message, 'error'); }
     finally { setLoading(false); }
   }
@@ -69,7 +98,7 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         fileKey = upload.fileKey;
       }
       await createNote(title, content, noteCategory, fileKey);
-      showToast('Note created! ✨', 'success');
+      showToast('Note created!', 'success');
       setTitle(''); setContent(''); setNoteCategory('general'); setFile(null); setFormOpen(false);
       loadNotes();
     } catch (err: unknown) { showToast((err as Error).message, 'error'); }
@@ -78,14 +107,14 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
 
   async function handleDelete() {
     if (!deleteId) return;
-    try { await deleteNote(deleteId); showToast('Poof! Note deleted 💨', 'success'); setDeleteId(null); loadNotes(); }
+    try { await deleteNote(deleteId); showToast('Note deleted', 'success'); setDeleteId(null); loadNotes(); }
     catch (err: unknown) { showToast((err as Error).message, 'error'); }
   }
 
   async function handleEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editNote) return;
-    try { await updateNote(editNote.noteId, editTitle, editContent, editCategory); showToast('Updated! ✓', 'success'); setEditNote(null); loadNotes(); }
+    try { await updateNote(editNote.noteId, editTitle, editContent, editCategory); showToast('Updated!', 'success'); setEditNote(null); loadNotes(); }
     catch (err: unknown) { showToast((err as Error).message, 'error'); }
   }
 
@@ -98,157 +127,218 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
     setEditNote(note); setEditTitle(note.title); setEditContent(note.content); setEditCategory(note.category);
   }
 
-  function handleLogout() { authLogout(); onLogout(); }
+  const catColors: Record<string, string> = {
+    general: 'bg-[var(--accent-light)]', lecture: 'bg-[var(--blue)] text-white', assignment: 'bg-[var(--orange)] text-white',
+    exam: 'bg-[var(--pink)] text-white', project: 'bg-[var(--purple)] text-white', personal: 'bg-[var(--lime)]',
+  };
+
+  const displayNotes = notes;
 
   return (
-    <div className="min-h-screen relative">
-      {/* Background doodles */}
-      <svg className="hidden md:block fixed top-24 right-8 w-14 h-14 opacity-20 animate-float pointer-events-none" viewBox="0 0 50 50" fill="none" stroke="#ff6b9d" strokeWidth="2.5">
-        <path d="M25 5 L28 18 L42 18 L31 27 L35 40 L25 32 L15 40 L19 27 L8 18 L22 18Z" />
-      </svg>
-      <svg className="hidden md:block fixed bottom-16 left-8 w-12 h-12 opacity-15 animate-float pointer-events-none" style={{ animationDelay: '1.5s' }} viewBox="0 0 40 40" fill="none" stroke="#4ecdc4" strokeWidth="2.5">
-        <circle cx="20" cy="20" r="16" strokeDasharray="6 6" />
-      </svg>
-      <svg className="hidden md:block fixed top-1/2 left-6 w-8 h-8 opacity-20 animate-float pointer-events-none" style={{ animationDelay: '0.7s' }} viewBox="0 0 32 32" fill="#ffe156">
-        <rect x="6" y="6" width="20" height="20" rx="2" transform="rotate(12 16 16)" />
-      </svg>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[var(--bg)]/95 backdrop-blur-sm border-b-[2.5px] border-[var(--border)] animate-slide-down">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[var(--yellow)] border-[2px] border-[var(--border)] flex items-center justify-center"
-              style={{ borderRadius: '4px 2px 6px 2px', boxShadow: 'var(--shadow-sm)' }}>
-              <span className="text-sm sm:text-base">📚</span>
-            </div>
-            <span className="text-xl sm:text-2xl tracking-tight" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700 }}>NoteStack</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <NotificationBell />
-            <ProfileSection onLogout={handleLogout} />
-          </div>
+    <div className="relative z-10">
+      {/* Title */}
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-6 animate-fade-up">
+        <div>
+          <h1 className="text-3xl sm:text-4xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, color: 'var(--ink)' }}>
+            My Notes
+          </h1>
+          <p className="text-base mt-1" style={{ color: 'var(--ink-light)' }}>{notes.length} note{notes.length !== 1 ? 's' : ''} in your collection</p>
         </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Title */}
-        <div className="flex flex-wrap items-end justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-up">
-          <div>
-            <h2 className="text-3xl sm:text-4xl tracking-tight" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700 }}>
-              Your Notes <span className="squiggly hidden sm:inline">collection</span>
-            </h2>
-            <p className="text-base mt-1" style={{ color: 'var(--ink-light)' }}>{notes.length} note{notes.length !== 1 ? 's' : ''} ★</p>
-          </div>
-          <button onClick={() => setFormOpen(!formOpen)} className="btn-doodle btn-primary text-base sm:text-lg !w-auto">
-            {formOpen ? '✕ Close' : '+ New Note'}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowStarredOnly(!showStarredOnly)}
+            className={`btn-doodle btn-outline text-sm !w-auto flex items-center gap-1.5 ${showStarredOnly ? '!bg-[var(--accent-light)]/30' : ''}`}
+          >
+            <IconStar size={16} filled={showStarredOnly} /> Starred
+          </button>
+          <button onClick={() => setFormOpen(!formOpen)} className="btn-doodle btn-primary text-base !w-auto flex items-center gap-2">
+            {formOpen ? <><IconX size={16} /> Close</> : <><IconPlus size={16} /> New Note</>}
           </button>
         </div>
+      </div>
 
-        {/* Create Form */}
-        {formOpen && (
-          <div className="mb-8 animate-fade-up">
-            <div className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 relative"
-              style={{ borderRadius: '8px 16px 6px 20px', boxShadow: '6px 6px 0px var(--border)' }}>
-              <div className="absolute -top-3 left-8 w-20 h-5 bg-[var(--blue)] border-[1.5px] border-[var(--border)] opacity-70" style={{ borderRadius: '2px', transform: 'rotate(-3deg)' }} />
-              <h3 className="text-xl sm:text-2xl mb-4" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>✏️ Write a note</h3>
-              <form onSubmit={handleCreate} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title..." required className="doodle-input flex-1" />
-                  <select value={noteCategory} onChange={e => setNoteCategory(e.target.value)} className="doodle-input sm:w-auto capitalize" style={{ minWidth: '140px' }}>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{catEmoji[c]} {c}</option>)}
-                  </select>
-                </div>
-                <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your thoughts here..." rows={4} required className="doodle-input resize-y" />
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                  <input type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={e => setFile(e.target.files?.[0] || null)}
-                    className="text-sm file:mr-3 file:py-2 file:px-4 file:border-[2px] file:border-[var(--border)] file:bg-[var(--lime)] file:text-[var(--ink)] file:cursor-pointer file:font-medium file:transition-all hover:file:shadow-[var(--shadow-sm)]"
-                    style={{ fontFamily: 'var(--font-body)' }} />
-                  <button disabled={creating} className="btn-doodle btn-primary text-base sm:!w-auto">{creating ? 'Creating...' : 'Create Note ★'}</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <div className="flex-1 relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="var(--ink-light)" strokeWidth="2.5" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" value={searchQuery} onChange={e => handleSearch(e.target.value)} placeholder="Search notes..." className="doodle-input" style={{ paddingLeft: '44px' }} />
-          </div>
-          <div className="flex gap-3">
-            <select value={category} onChange={e => setCategory(e.target.value)} className="doodle-input flex-1 sm:flex-none sm:w-auto capitalize" style={{ minWidth: '140px' }}>
-              <option value="">📂 All</option>
-              {CATEGORIES.map(c => <option key={c} value={c}>{catEmoji[c]} {c}</option>)}
-            </select>
-            <label className="flex items-center gap-2 px-3 sm:px-4 py-3 border-[2.5px] border-[var(--border)] cursor-pointer select-none hover:bg-[var(--yellow)]/15 transition-colors whitespace-nowrap"
-              style={{ borderRadius: '4px 8px 2px 6px', boxShadow: 'var(--shadow-sm)', fontFamily: 'var(--font-body)', fontSize: '15px', background: 'var(--bg-card)' }}>
-              <input type="checkbox" checked={showShared} onChange={e => setShowShared(e.target.checked)} className="accent-[var(--pink)] w-4 h-4" />
-              📤 <span className="hidden sm:inline">Shared</span>
-            </label>
+      {/* Create Form */}
+      {formOpen && (
+        <div className="mb-8 animate-fade-up">
+          <div className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 relative"
+            style={{ borderRadius: '8px 16px 6px 20px', boxShadow: 'var(--shadow)' }}>
+            <div className="absolute -top-3 left-8 w-20 h-5 bg-[var(--blue)] border-[1.5px] border-[var(--border)] opacity-70" style={{ borderRadius: '2px', transform: 'rotate(-3deg)' }} />
+            <h3 className="text-xl sm:text-2xl mb-4 flex items-center gap-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)' }}>
+              <IconPlus size={20} /> Write a note
+            </h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title..." required className="doodle-input flex-1" />
+                <select value={noteCategory} onChange={e => setNoteCategory(e.target.value)} className="doodle-input sm:w-auto capitalize" style={{ minWidth: '140px' }}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your thoughts here..." rows={4} required className="doodle-input resize-y" />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <input type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={e => setFile(e.target.files?.[0] || null)}
+                  className="text-sm file:mr-3 file:py-2 file:px-4 file:border-[2px] file:border-[var(--border)] file:bg-[var(--lime)] file:cursor-pointer file:font-medium"
+                  style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }} />
+                <button disabled={creating} className="btn-doodle btn-primary text-base sm:!w-auto flex items-center gap-2">
+                  <IconPlus size={16} /> {creating ? 'Creating...' : 'Create Note'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      )}
 
-        {/* Loading */}
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {[1,2,3].map(i => (
-              <div key={i} className="doodle-border bg-[var(--bg-card)] p-5" style={{ borderRadius: '6px 12px 4px 14px' }}>
-                <div className="h-5 w-3/5 bg-[var(--yellow)]/30 rounded mb-4 animate-pulse" />
-                <div className="h-4 w-full bg-[var(--border-light)] rounded mb-2 animate-pulse" />
-                <div className="h-4 w-4/5 bg-[var(--border-light)] rounded animate-pulse" />
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+        <div className="flex-1 relative">
+          <IconSearch size={18} className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--ink-light)' }} />
+          <input type="text" value={searchQuery} onChange={e => handleSearch(e.target.value)} placeholder="Search notes..." className="doodle-input" style={{ paddingLeft: '44px' }} />
+        </div>
+        <select value={category} onChange={e => setCategory(e.target.value)} className="doodle-input sm:w-auto capitalize" style={{ minWidth: '140px' }}>
+          <option value="">All Categories</option>
+          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div className="space-y-4">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 animate-pulse" style={{ borderRadius: '8px 14px 6px 16px' }}>
+              <div className="h-7 w-2/5 bg-[var(--accent-light)]/30 rounded mb-3" />
+              <div className="h-4 w-full bg-[var(--border-light)] rounded mb-2" />
+              <div className="h-4 w-3/4 bg-[var(--border-light)] rounded" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && displayNotes.length === 0 && (
+        <div className="text-center py-20 animate-fade-in">
+          {showStarredOnly ? (
+            <>
+              <IconStar size={56} className="mx-auto mb-4 opacity-20" />
+              <h3 className="text-3xl mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)' }}>No starred notes</h3>
+              <p className="text-base" style={{ color: 'var(--ink-light)' }}>Click the star icon on a note to save it here</p>
+            </>
+          ) : (
+            <>
+              <IconPlus size={56} className="mx-auto mb-4 opacity-20" />
+              <h3 className="text-3xl mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)' }}>No notes yet!</h3>
+              <p className="text-base" style={{ color: 'var(--ink-light)' }}>Click &quot;+ New Note&quot; to create your first one</p>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Notes — Full Width Cards */}
+      {!loading && displayNotes.length > 0 && (
+        <div className="space-y-5 sm:space-y-6">
+          {displayNotes.map((note, i) => (
+            <div
+              key={note.noteId}
+              className="group bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] overflow-hidden transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[var(--shadow-hover)] animate-fade-up relative"
+              style={{
+                borderRadius: `${8 + (i % 3) * 2}px ${14 - (i % 2) * 4}px ${6 + (i % 4)}px ${16 - (i % 3) * 3}px`,
+                boxShadow: 'var(--shadow)',
+                animationDelay: `${i * 0.06}s`,
+              }}
+            >
+              {/* Star + Shared badge top row */}
+              <div className="px-5 sm:px-8 pt-5 sm:pt-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {note.isShared && (
+                    <span className="text-xs sm:text-sm font-bold px-3 py-1 border-[1.5px] border-[var(--purple)] bg-[var(--purple-light)] flex items-center gap-1" style={{ borderRadius: '2px 6px 2px 6px', fontFamily: 'var(--font-body)', color: 'var(--purple)' }}>
+                      <IconShare size={14} /> Shared with you
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => toggleStar(note.noteId)} className="p-2 hover:scale-125 transition-transform" style={{ color: starred.has(note.noteId) ? '#e6c800' : 'var(--ink-light)' }}>
+                  <IconStar size={24} filled={starred.has(note.noteId)} />
+                </button>
               </div>
-            ))}
-          </div>
-        )}
 
-        {/* Empty */}
-        {!loading && notes.length === 0 && (
-          <div className="text-center py-20 animate-fade-in">
-            <div className="text-6xl mb-4 animate-float">📝</div>
-            <h3 className="text-3xl mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>No notes yet!</h3>
-            <p className="text-base" style={{ color: 'var(--ink-light)' }}>Click &quot;+ New Note&quot; to create your first one ~</p>
-          </div>
-        )}
+              {/* Content */}
+              <div className="px-5 sm:px-8 pb-5 sm:pb-6">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl leading-tight mb-2 line-clamp-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, color: 'var(--ink)' }}>
+                  {note.title}
+                </h3>
+                <p className="text-base sm:text-lg leading-relaxed mb-4 line-clamp-3" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>
+                  {note.content}
+                </p>
 
-        {/* Notes Grid */}
-        {!loading && notes.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {notes.map((note, i) => (
-              <NoteCard key={note.noteId} note={note} index={i} onEdit={openEdit} onDelete={setDeleteId} onShare={setShareId} onDownload={handleDownload} />
-            ))}
-          </div>
-        )}
-      </main>
+                {/* Bottom row: tags + meta left, download + actions right */}
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span
+                      className={`text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-[var(--border)] capitalize flex items-center gap-1.5 ${catColors[note.category] || catColors.general}`}
+                      style={{ borderRadius: '4px 8px 2px 6px', fontFamily: 'var(--font-body)' }}
+                    >
+                      <IconTag size={16} /> {note.category}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs sm:text-sm" style={{ color: 'var(--ink-light)' }}>
+                      <IconClock size={14} /> {new Date(note.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {note.fileKey && (
+                      <button
+                        onClick={() => handleDownload(note.fileKey!)}
+                        className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border-[2px] border-[var(--border)] text-sm sm:text-base font-semibold transition-all hover:translate-y-[-1px] hover:shadow-[var(--shadow-sm)]"
+                        style={{ borderRadius: '2px 6px 4px 8px', color: 'var(--blue)', background: 'var(--bg-card)', fontFamily: 'var(--font-body)' }}
+                      >
+                        <IconDownload size={18} /> Download
+                      </button>
+                    )}
+                    {!note.isShared && (
+                      <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openEdit(note)} className="p-2 border-[2px] border-[var(--border)] hover:bg-[var(--accent-light)]/20 transition-colors" style={{ borderRadius: '4px 2px 6px 2px' }} title="Edit">
+                          <IconEdit size={16} />
+                        </button>
+                        <button onClick={() => setDeleteId(note.noteId)} className="p-2 border-[2px] border-[var(--border)] hover:bg-[var(--pink)]/20 transition-colors" style={{ borderRadius: '2px 6px 2px 4px', color: 'var(--pink)' }} title="Delete">
+                          <IconTrash size={16} />
+                        </button>
+                        <button onClick={() => setShareId(note.noteId)} className="p-2 border-[2px] border-[var(--border)] hover:bg-[var(--blue)]/20 transition-colors" style={{ borderRadius: '4px 2px 4px 6px' }} title="Share">
+                          <IconShare size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Delete Modal */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)}>
-        <div className="text-center mb-4"><span className="text-5xl">🗑️</span></div>
-        <h3 className="text-2xl text-center mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Delete this note?</h3>
+        <div className="text-center mb-4"><IconTrash size={48} className="mx-auto opacity-60" style={{ color: 'var(--pink)' }} /></div>
+        <h3 className="text-2xl text-center mb-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)' }}>Delete this note?</h3>
         <p className="text-sm text-center mb-6" style={{ color: 'var(--ink-light)' }}>This action cannot be undone!</p>
         <div className="flex gap-3 justify-center">
           <button onClick={() => setDeleteId(null)} className="btn-doodle btn-outline">Cancel</button>
-          <button onClick={handleDelete} className="btn-doodle btn-danger">Delete it!</button>
+          <button onClick={handleDelete} className="btn-doodle btn-danger">Delete</button>
         </div>
       </Modal>
 
-      {/* Share Modal */}
       <ShareModal noteId={shareId} onClose={() => setShareId(null)} />
 
       {/* Edit Modal */}
       <Modal open={!!editNote} onClose={() => setEditNote(null)}>
-        <h3 className="text-2xl mb-4" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>✏️ Edit Note</h3>
+        <h3 className="text-2xl mb-4 flex items-center gap-2" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)' }}>
+          <IconEdit size={20} /> Edit Note
+        </h3>
         <form onSubmit={handleEdit} className="space-y-4">
           <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} required className="doodle-input" />
           <select value={editCategory} onChange={e => setEditCategory(e.target.value)} className="doodle-input capitalize">
-            {CATEGORIES.map(c => <option key={c} value={c}>{catEmoji[c]} {c}</option>)}
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={4} required className="doodle-input resize-y" />
           <div className="flex gap-3 justify-center">
             <button type="button" onClick={() => setEditNote(null)} className="btn-doodle btn-outline">Cancel</button>
-            <button type="submit" className="btn-doodle btn-primary">Save ✓</button>
+            <button type="submit" className="btn-doodle btn-primary">Save</button>
           </div>
         </form>
       </Modal>

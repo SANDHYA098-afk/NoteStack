@@ -1,42 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fffef9;
+  /* Light theme — fresh botanical palette from logo */
+  --bg: #f7faf2;
   --bg-card: #ffffff;
-  --ink: #2d2d2d;
-  --ink-light: #666;
-  --yellow: #ffe156;
-  --yellow-dark: #e6c800;
-  --pink: #ff6b9d;
-  --pink-light: #fff0f5;
-  --blue: #4ecdc4;
-  --blue-light: #e8faf8;
-  --lime: #a8e06c;
-  --lime-light: #f3fbe8;
-  --orange: #ff8a5c;
-  --orange-light: #fff3ee;
-  --purple: #b57bee;
-  --purple-light: #f5edff;
-  --border: #2d2d2d;
-  --border-light: #e0ddd5;
-  --shadow: 4px 4px 0px #2d2d2d;
-  --shadow-sm: 2px 2px 0px #2d2d2d;
-  --shadow-hover: 6px 6px 0px #2d2d2d;
+  --ink: #1a2e1a;
+  --ink-light: #5a6b5a;
+  --accent: #7bc043;
+  --accent-dark: #5a9e2f;
+  --accent-light: #e8f5d8;
+  --yellow: #d4e157;
+  --yellow-dark: #b8c43a;
+  --pink: #e85d75;
+  --pink-light: #fde8ec;
+  --blue: #4db6ac;
+  --blue-light: #e0f2f1;
+  --lime: #8bc34a;
+  --lime-light: #f1f8e9;
+  --orange: #ff8a65;
+  --orange-light: #fff3e0;
+  --purple: #9575cd;
+  --purple-light: #ede7f6;
+  --border: #2d3a2d;
+  --border-light: #d5dfc8;
+  --shadow: 4px 4px 0px #2d3a2d;
+  --shadow-sm: 2px 2px 0px #2d3a2d;
+  --shadow-hover: 6px 6px 0px #2d3a2d;
   --font-hand: 'Caveat', cursive;
   --font-body: 'Patrick Hand', cursive;
   --radius: 4px;
 }
 
 [data-theme="dark"] {
-  --bg: #1a1a2e;
-  --bg-card: #222240;
-  --ink: #fffef9;
-  --ink-light: #b0b0c0;
-  --border: #fffef9;
-  --border-light: #3a3a5e;
-  --shadow: 4px 4px 0px #fffef9;
-  --shadow-sm: 2px 2px 0px #fffef9;
-  --shadow-hover: 6px 6px 0px #fffef9;
+  /* Dark theme — deep forest night */
+  --bg: #0f1a0f;
+  --bg-card: #1a2a1a;
+  --ink: #e8f0e0;
+  --ink-light: #a8b8a0;
+  --accent: #8bc34a;
+  --accent-dark: #6fa030;
+  --accent-light: #1e3018;
+  --border: #5a7a50;
+  --border-light: #2a3a28;
+  --pink-light: #2a1820;
+  --blue-light: #142220;
+  --lime-light: #1e2e14;
+  --orange-light: #2a1e14;
+  --purple-light: #1e1428;
+  --shadow: 4px 4px 0px #3a5a35;
+  --shadow-sm: 2px 2px 0px #3a5a35;
+  --shadow-hover: 6px 6px 0px #4a6a44;
 }
 
 @theme inline {
@@ -45,6 +58,34 @@
 }
 
 * { box-sizing: border-box; }
+
+/* Theme-based visibility */
+.dark-hidden { display: block; }
+.dark-visible { display: none; }
+[data-theme="dark"] .dark-hidden { display: none; }
+[data-theme="dark"] .dark-visible { display: block; }
+
+/* Sidebar tooltip */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 4px 10px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  border-radius: 4px;
+  z-index: 100;
+  pointer-events: none;
+  animation: fadeIn 0.15s ease;
+}
 
 body {
   background: var(--bg);
@@ -205,7 +246,7 @@ body::after {
 .doodle-input:focus {
   outline: none;
   box-shadow: var(--shadow-sm);
-  border-color: var(--pink);
+  border-color: var(--accent);
   transform: translate(-1px, -1px);
 }
 
@@ -235,8 +276,8 @@ body::after {
 }
 
 .btn-primary {
-  background: var(--yellow);
-  color: var(--ink);
+  background: var(--accent);
+  color: #fff;
   border-radius: 4px 8px 2px 10px;
   box-shadow: var(--shadow);
 }
@@ -244,7 +285,7 @@ body::after {
 .btn-primary:hover {
   box-shadow: var(--shadow-hover);
   transform: translate(-2px, -2px);
-  background: var(--yellow-dark);
+  background: var(--accent-dark);
 }
 
 .btn-outline {
@@ -272,7 +313,7 @@ body::after {
 }
 
 /* Category colors */
-.cat-general { background: var(--yellow); }
+.cat-general { background: var(--accent-light); color: var(--accent-dark); }
 .cat-lecture { background: var(--blue); color: white; }
 .cat-assignment { background: var(--orange); color: white; }
 .cat-exam { background: var(--pink); color: white; }

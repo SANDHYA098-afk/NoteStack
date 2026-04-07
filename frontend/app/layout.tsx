@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "NoteStack — Student Notes Platform",
   description: "A serverless student notes and file sharing platform",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/book2.png",
   },
 };
 
