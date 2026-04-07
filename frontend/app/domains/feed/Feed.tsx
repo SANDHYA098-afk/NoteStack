@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getFeedNotes, type Note } from '../notes/api';
+import { getFeedNotes, toggleStar as apiToggleStar, getStarredIds, type Note } from '../notes/api';
 import { getDownloadUrl } from '../files/api';
 import { CATEGORIES } from '../../shared/config';
 import { showToast } from '../../shared/Toast';
@@ -16,19 +16,28 @@ export default function Feed() {
   const [starred, setStarred] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const saved = localStorage.getItem('notestack-starred');
-    if (saved) setStarred(new Set(JSON.parse(saved)));
+    getStarredIds().then(data => setStarred(new Set(data.starredIds))).catch(() => {});
   }, []);
 
   useEffect(() => { loadFeed(); }, [selectedCat]);
 
-  function toggleStar(noteId: string) {
+  async function handleToggleStar(noteId: string) {
+    const wasStarred = starred.has(noteId);
     setStarred(prev => {
       const next = new Set(prev);
-      if (next.has(noteId)) next.delete(noteId); else next.add(noteId);
-      localStorage.setItem('notestack-starred', JSON.stringify([...next]));
+      if (wasStarred) next.delete(noteId); else next.add(noteId);
       return next;
     });
+    try {
+      await apiToggleStar(noteId);
+    } catch {
+      setStarred(prev => {
+        const next = new Set(prev);
+        if (wasStarred) next.add(noteId); else next.delete(noteId);
+        return next;
+      });
+      showToast('Failed to update star', 'error');
+    }
   }
 
   async function loadFeed() {
@@ -224,7 +233,7 @@ export default function Feed() {
                       </p>
                     </div>
                   </div>
-                  <button onClick={() => toggleStar(note.noteId)} className="p-2 hover:scale-125 transition-transform" style={{ color: starred.has(note.noteId) ? '#e6c800' : 'var(--ink-light)' }}>
+                  <button onClick={() => handleToggleStar(note.noteId)} className="p-2 hover:scale-125 transition-transform" style={{ color: starred.has(note.noteId) ? '#e6c800' : 'var(--ink-light)' }}>
                     <IconStar size={24} filled={starred.has(note.noteId)} />
                   </button>
                 </div>

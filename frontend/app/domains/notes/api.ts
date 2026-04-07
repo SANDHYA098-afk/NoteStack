@@ -45,3 +45,11 @@ export async function deleteNote(noteId: string) {
 export async function searchNotes(query: string) {
   return apiCall("GET", `/notes/search?q=${encodeURIComponent(query)}`);
 }
+
+export async function toggleStar(noteId: string): Promise<{ starred: boolean; noteId: string }> {
+  return apiCall("POST", "/notes/star", { noteId });
+}
+
+export async function getStarredIds(): Promise<{ starredIds: string[] }> {
+  return apiCall("GET", "/notes/star");
+}

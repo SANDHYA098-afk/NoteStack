@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getNotes, getFeedNotes, createNote, updateNote, deleteNote, searchNotes, type Note } from './api';
+import { getNotes, getFeedNotes, createNote, updateNote, deleteNote, searchNotes, toggleStar as apiToggleStar, getStarredIds, type Note } from './api';
 import { getUploadUrl, getDownloadUrl } from '../files/api';
 import { CATEGORIES } from '../../shared/config';
 import { showToast } from '../../shared/Toast';
@@ -40,10 +40,16 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
   const [starredLoaded, setStarredLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('notestack-starred');
-    if (saved) setStarred(new Set(JSON.parse(saved)));
-    setStarredLoaded(true);
+    loadStarred();
   }, []);
+
+  async function loadStarred() {
+    try {
+      const data = await getStarredIds();
+      setStarred(new Set(data.starredIds));
+    } catch { /* silent */ }
+    setStarredLoaded(true);
+  }
 
   useEffect(() => {
     if (starredLoaded) loadNotes();
@@ -53,17 +59,29 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
     if (forceNewNote) { setFormOpen(true); onNewNoteShown?.(); }
   }, [forceNewNote, onNewNoteShown]);
 
-  function toggleStar(noteId: string) {
+  async function handleToggleStar(noteId: string) {
+    // Optimistic update
+    const wasStarred = starred.has(noteId);
     setStarred(prev => {
       const next = new Set(prev);
-      if (next.has(noteId)) next.delete(noteId); else next.add(noteId);
-      localStorage.setItem('notestack-starred', JSON.stringify([...next]));
-      // If in starred view and unstarring, remove from display
-      if (showStarredOnly && prev.has(noteId)) {
-        setNotes(notes.filter(n => n.noteId !== noteId));
-      }
+      if (wasStarred) next.delete(noteId); else next.add(noteId);
       return next;
     });
+    if (showStarredOnly && wasStarred) {
+      setNotes(notes.filter(n => n.noteId !== noteId));
+    }
+
+    try {
+      await apiToggleStar(noteId);
+    } catch {
+      // Revert on failure
+      setStarred(prev => {
+        const next = new Set(prev);
+        if (wasStarred) next.add(noteId); else next.delete(noteId);
+        return next;
+      });
+      showToast('Failed to update star', 'error');
+    }
   }
 
   async function loadNotes() {
@@ -263,7 +281,7 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
                     </span>
                   )}
                 </div>
-                <button onClick={() => toggleStar(note.noteId)} className="p-2 hover:scale-125 transition-transform" style={{ color: starred.has(note.noteId) ? '#e6c800' : 'var(--ink-light)' }}>
+                <button onClick={() => handleToggleStar(note.noteId)} className="p-2 hover:scale-125 transition-transform" style={{ color: starred.has(note.noteId) ? '#e6c800' : 'var(--ink-light)' }}>
                   <IconStar size={24} filled={starred.has(note.noteId)} />
                 </button>
               </div>

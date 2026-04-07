@@ -6,14 +6,13 @@ import { getNotes, type Note } from '../notes/api';
 import NoteCard from '../notes/NoteCard';
 import { getDownloadUrl } from '../files/api';
 import { showToast } from '../../shared/Toast';
-import { IconNotes, IconFile, IconTag, IconClock, IconCamera, IconEdit } from '../../shared/icons/Icons';
+import { IconNotes, IconFile, IconTag, IconClock, IconEdit } from '../../shared/icons/Icons';
 
 export default function Profile() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [editingName, setEditingName] = useState(false);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
   const email = getUserEmail() || 'student';
   const name = username || email.split('@')[0];
   const initial = name.charAt(0).toUpperCase();
@@ -24,9 +23,7 @@ export default function Profile() {
   useEffect(() => {
     loadNotes();
     const savedName = localStorage.getItem('notestack-username');
-    const savedPic = localStorage.getItem('notestack-profile-pic');
     if (savedName) setUsername(savedName);
-    if (savedPic) setProfilePic(savedPic);
   }, []);
 
   async function loadNotes() {
@@ -48,19 +45,6 @@ export default function Profile() {
     showToast('Username updated!', 'success');
   }
 
-  function handleProfilePic(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { showToast('Image must be under 2MB', 'error'); return; }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setProfilePic(dataUrl);
-      localStorage.setItem('notestack-profile-pic', dataUrl);
-      showToast('Profile picture updated!', 'success');
-    };
-    reader.readAsDataURL(file);
-  }
 
   const categories = [...new Set(notes.map(n => n.category))];
   const filesCount = notes.filter(n => n.fileKey).length;
@@ -74,26 +58,11 @@ export default function Profile() {
       >
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Avatar with picture upload */}
-          <div className="relative group">
-            {profilePic ? (
-              <div
-                className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] overflow-hidden shrink-0"
-                style={{ borderRadius: '16px', boxShadow: 'var(--shadow)' }}
-              >
-                <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div
-                className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] flex items-center justify-center text-5xl font-bold shrink-0"
-                style={{ borderRadius: '16px', background: avatarColors[colorIndex], boxShadow: 'var(--shadow)', fontFamily: 'var(--font-hand)', color: 'var(--ink)' }}
-              >
-                {initial}
-              </div>
-            )}
-            <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" style={{ borderRadius: '16px' }}>
-              <IconCamera size={24} className="text-white" />
-              <input type="file" accept="image/*" onChange={handleProfilePic} className="hidden" />
-            </label>
+          <div
+            className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] flex items-center justify-center text-5xl font-bold shrink-0"
+            style={{ borderRadius: '16px', background: avatarColors[colorIndex], boxShadow: 'var(--shadow)', fontFamily: 'var(--font-hand)', color: 'var(--ink)' }}
+          >
+            {initial}
           </div>
 
           {/* Info */}

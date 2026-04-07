@@ -18,7 +18,6 @@ interface SidebarProps {
 export default function Sidebar({ currentPage, onNavigate, onLogout, onNewNote, unreadNotifs, onToggleNotifs }: SidebarProps) {
   const [expanded, setExpanded] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const [profilePic, setProfilePic] = useState<string | null>(null);
   const email = getUserEmail() || 'student';
   const initial = email.charAt(0).toUpperCase();
 
@@ -29,20 +28,6 @@ export default function Sidebar({ currentPage, onNavigate, onLogout, onNewNote, 
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Load profile picture and listen for changes
-  useEffect(() => {
-    setProfilePic(localStorage.getItem('notestack-profile-pic'));
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'notestack-profile-pic') setProfilePic(e.newValue);
-    };
-    window.addEventListener('storage', handleStorage);
-    // Also poll for same-tab changes
-    const interval = setInterval(() => {
-      const current = localStorage.getItem('notestack-profile-pic');
-      setProfilePic(prev => current !== prev ? current : prev);
-    }, 2000);
-    return () => { window.removeEventListener('storage', handleStorage); clearInterval(interval); };
-  }, []);
 
   // On mobile, sidebar is hidden by default and overlays
   const sidebarWidth = expanded ? 'w-[220px]' : 'w-[60px]';
@@ -176,18 +161,12 @@ export default function Sidebar({ currentPage, onNavigate, onLogout, onNewNote, 
             onClick={() => handleNav('profile')}
             className={`w-full flex items-center gap-3 py-2 rounded-md transition-all hover:bg-[var(--accent-light)]/10 ${expanded ? 'px-3 justify-start' : 'px-0 justify-center'}`}
           >
-            {profilePic ? (
-              <div className="w-8 h-8 border-[2px] border-[var(--border)] overflow-hidden shrink-0" style={{ borderRadius: '8px' }}>
-                <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div
-                className="w-8 h-8 border-[2px] border-[var(--border)] flex items-center justify-center text-sm font-bold shrink-0"
-                style={{ borderRadius: '8px', background: avatarColors[colorIndex], fontFamily: 'var(--font-hand)' }}
-              >
-                {initial}
-              </div>
-            )}
+            <div
+              className="w-8 h-8 border-[2px] border-[var(--border)] flex items-center justify-center text-sm font-bold shrink-0"
+              style={{ borderRadius: '8px', background: avatarColors[colorIndex], fontFamily: 'var(--font-hand)' }}
+            >
+              {initial}
+            </div>
             {expanded && (
               <div className="text-left min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ fontFamily: 'var(--font-hand)' }}>{email.split('@')[0]}</p>
