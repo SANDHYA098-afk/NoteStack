@@ -184,7 +184,7 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
               )}
 
               <p className="text-center text-xs mt-6" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>
-                Powered by AWS Lambda, DynamoDB & Cognito
+                For students, By students
               </p>
             </>
           )}
