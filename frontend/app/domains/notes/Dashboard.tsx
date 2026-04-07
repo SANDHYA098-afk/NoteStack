@@ -37,13 +37,17 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
   const [editContent, setEditContent] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [showStarredOnly, setShowStarredOnly] = useState(false);
+  const [starredLoaded, setStarredLoaded] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('notestack-starred');
     if (saved) setStarred(new Set(JSON.parse(saved)));
+    setStarredLoaded(true);
   }, []);
 
-  useEffect(() => { loadNotes(); }, [category, showStarredOnly]);
+  useEffect(() => {
+    if (starredLoaded) loadNotes();
+  }, [category, showStarredOnly, starredLoaded]);
 
   useEffect(() => {
     if (forceNewNote) { setFormOpen(true); onNewNoteShown?.(); }
@@ -74,8 +78,9 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
         const data = await getNotes(category || undefined, true);
         setNotes(data.notes);
       }
-    } catch (err: unknown) { showToast((err as Error).message, 'error'); }
-    finally { setLoading(false); }
+    } catch (err: unknown) {
+      showToast('Failed to load notes: ' + (err as Error).message, 'error');
+    } finally { setLoading(false); }
   }
 
   function handleSearch(value: string) {
@@ -142,7 +147,12 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
           <h1 className="text-3xl sm:text-4xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, color: 'var(--ink)' }}>
             My Notes
           </h1>
-          <p className="text-base mt-1" style={{ color: 'var(--ink-light)' }}>{notes.length} note{notes.length !== 1 ? 's' : ''} in your collection</p>
+          <p className="text-base mt-1" style={{ color: 'var(--ink-light)' }}>
+            {showStarredOnly
+              ? `${displayNotes.length} starred note${displayNotes.length !== 1 ? 's' : ''}`
+              : `${notes.length} note${notes.length !== 1 ? 's' : ''} in your collection`
+            }
+          </p>
         </div>
         <div className="flex gap-2">
           <button

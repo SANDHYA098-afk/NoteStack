@@ -77,20 +77,20 @@ export default function Profile() {
           <div className="relative group">
             {profilePic ? (
               <div
-                className="w-24 h-24 border-[3px] border-[var(--border)] overflow-hidden shrink-0"
-                style={{ borderRadius: '12px 4px 16px 4px', boxShadow: 'var(--shadow)' }}
+                className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] overflow-hidden shrink-0"
+                style={{ borderRadius: '16px', boxShadow: 'var(--shadow)' }}
               >
                 <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
               </div>
             ) : (
               <div
-                className="w-24 h-24 border-[3px] border-[var(--border)] flex items-center justify-center text-4xl font-bold shrink-0"
-                style={{ borderRadius: '12px 4px 16px 4px', background: avatarColors[colorIndex], boxShadow: 'var(--shadow)', fontFamily: 'var(--font-hand)', color: 'var(--ink)' }}
+                className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] flex items-center justify-center text-5xl font-bold shrink-0"
+                style={{ borderRadius: '16px', background: avatarColors[colorIndex], boxShadow: 'var(--shadow)', fontFamily: 'var(--font-hand)', color: 'var(--ink)' }}
               >
                 {initial}
               </div>
             )}
-            <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" style={{ borderRadius: '12px 4px 16px 4px' }}>
+            <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" style={{ borderRadius: '16px' }}>
               <IconCamera size={24} className="text-white" />
               <input type="file" accept="image/*" onChange={handleProfilePic} className="hidden" />
             </label>

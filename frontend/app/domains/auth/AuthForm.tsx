@@ -87,7 +87,7 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       <div className="relative z-10 flex flex-col items-center justify-center px-6 py-10 lg:py-0 lg:w-[45%] xl:w-[50%]" style={{ background: 'var(--bg)' }}>
         {/* Illustration */}
         <div className="w-40 h-40 sm:w-56 sm:h-56 lg:w-72 lg:h-72 xl:w-96 xl:h-96 animate-fade-up">
-          <img src="/book.webp" alt="NoteStack" className="w-full h-full object-contain drop-shadow-xl dark-hidden" />
+          <img src="/book2.png" alt="NoteStack" className="w-full h-full object-contain drop-shadow-xl dark-hidden" />
           <img src="/bookimg.png" alt="NoteStack" className="w-full h-full object-contain drop-shadow-xl hidden dark-visible" />
         </div>
 
