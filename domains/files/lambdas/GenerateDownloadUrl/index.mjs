@@ -1,6 +1,6 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { respond, log, getUserId, getQueryParam } from "../../../../shared/utils.mjs";
+import { respond, log, getUserId, getQueryParam } from "./utils.mjs";
 
 const s3Client = new S3Client({ region: "ap-south-1" });
 const BUCKET_NAME = process.env.BUCKET_NAME || "notestack-files-sandhiya";

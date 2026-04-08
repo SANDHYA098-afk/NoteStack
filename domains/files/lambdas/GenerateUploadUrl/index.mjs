@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-import { respond, log, getUserId, parseBody } from "../../../../shared/utils.mjs";
+import { respond, log, getUserId, parseBody } from "./utils.mjs";
 
 const s3Client = new S3Client({ region: "ap-south-1" });
 const secretsClient = new SecretsManagerClient({ region: "ap-south-1" });

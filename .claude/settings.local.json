@@ -53,7 +53,25 @@
       "Bash(rm -f utils.mjs index_deploy.mjs NoteStack-GetAllNotes.zip)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://019vhyfrah.execute-api.ap-south-1.amazonaws.com/dev/notes/feed\")",
       "Bash(sed -i 's/{ size = d.size, className = d.className }: IconProps/{ size = d.size, className = d.className, style = d.style }: IconProps/g' Icons.tsx)",
-      "Bash(sed -i 's/className={className}>/className={className} style={style}>/g' Icons.tsx)"
+      "Bash(sed -i 's/className={className}>/className={className} style={style}>/g' Icons.tsx)",
+      "Bash(node --test tests/backend/test-utils.mjs)",
+      "Bash(node --test tests/backend/)",
+      "Bash(node --test tests/backend/test-*.mjs)",
+      "Bash(npm list:*)",
+      "Bash(npm install:*)",
+      "Bash(cdk --version)",
+      "Bash(mkdir -p \"c:/Users/Admin/Desktop/NoteStack/cdk\")",
+      "Bash(cdk init:*)",
+      "Bash(bash cdk/bundle-lambdas.sh)",
+      "Bash(npx cdk:*)",
+      "Bash(cdk bootstrap:*)",
+      "Bash(cdk diff:*)",
+      "Bash(cdk deploy:*)",
+      "Bash(sed -i \"/tableName: 'NoteStack-/d\" cdk-stack.ts)",
+      "Bash(sed -i \"/functionName: 'NoteStack-/d\" cdk-stack.ts)",
+      "Bash(sed -i \"/bucketName:/d\" cdk-stack.ts)",
+      "Bash(sed -i \"/userPoolName:/d\" cdk-stack.ts)",
+      "Bash(sed -i \"/userPoolClientName:/d\" cdk-stack.ts)"
     ]
   }
 }
