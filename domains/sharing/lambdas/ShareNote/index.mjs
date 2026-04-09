@@ -7,9 +7,9 @@ const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const cognitoClient = new CognitoIdentityProviderClient({ region: "ap-south-1" });
 
-const NOTES_TABLE = "NoteStack-Notes";
-const NOTIFICATIONS_TABLE = "NoteStack-Notifications";
-const SHARED_TABLE = "NoteStack-SharedNotes";
+const NOTES_TABLE = process.env.NOTES_TABLE || "NoteStack-Notes";
+const NOTIFICATIONS_TABLE = process.env.NOTIFICATIONS_TABLE || "NoteStack-Notifications";
+const SHARED_TABLE = process.env.SHARED_TABLE || "NoteStack-SharedNotes";
 const USER_POOL_ID = process.env.USER_POOL_ID || "ap-south-1_EM3m76UWV";
 
 export async function handler(event) {

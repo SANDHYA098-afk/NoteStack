@@ -5,7 +5,7 @@ import { respond, log, getUserId } from "./utils.mjs";
 const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
-const TABLE_NAME = "NoteStack-Notifications";
+const TABLE_NAME = process.env.NOTIFICATIONS_TABLE || "NoteStack-Notifications";
 
 export async function handler(event) {
   try {

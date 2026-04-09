@@ -7,8 +7,8 @@ const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const s3Client = new S3Client({ region: "ap-south-1" });
 
-const TABLE_NAME = "NoteStack-Notes";
-const SHARED_TABLE = "NoteStack-SharedNotes";
+const TABLE_NAME = process.env.NOTES_TABLE || "NoteStack-Notes";
+const SHARED_TABLE = process.env.SHARED_TABLE || "NoteStack-SharedNotes";
 const BUCKET_NAME = process.env.BUCKET_NAME || "notestack-files-YOURNAME";
 const MAX_AGE_DAYS = 30;
 

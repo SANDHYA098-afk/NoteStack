@@ -5,7 +5,7 @@ import { respond, log, getUserId, getQueryParam } from "./utils.mjs";
 const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
-const TABLE_NAME = "NoteStack-Notes";
+const TABLE_NAME = process.env.NOTES_TABLE || "NoteStack-Notes";
 
 export async function handler(event) {
   try {

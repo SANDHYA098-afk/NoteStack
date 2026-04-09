@@ -7,8 +7,8 @@ const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const secretsClient = new SecretsManagerClient({ region: "ap-south-1" });
 
-const TABLE_NAME = "NoteStack-Notes";
-const NOTIFICATIONS_TABLE = "NoteStack-Notifications";
+const TABLE_NAME = process.env.NOTES_TABLE || "NoteStack-Notes";
+const NOTIFICATIONS_TABLE = process.env.NOTIFICATIONS_TABLE || "NoteStack-Notifications";
 let cachedSecrets = null;
 
 async function getSecrets() {

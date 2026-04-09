@@ -138,10 +138,14 @@ export default function Dashboard({ onLogout, forceNewNote, onNewNoteShown }: Da
             <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--ink)' }}>Create Note</h3>
             <form onSubmit={handleCreate} className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title" required className="doodle-input flex-1" />
-                <select value={noteCategory} onChange={e => setNoteCategory(e.target.value)} className="doodle-input sm:w-auto capitalize" style={{ minWidth: '140px' }}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <div className="flex-1 min-w-0">
+                  <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title" required className="doodle-input min-w-0" />
+                </div>
+                <div className="sm:w-[170px] shrink-0">
+                  <select value={noteCategory} onChange={e => setNoteCategory(e.target.value)} className="doodle-input capitalize">
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
               </div>
               <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your note..." rows={4} required className="doodle-input resize-y" />
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">

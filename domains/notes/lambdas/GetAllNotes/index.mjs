@@ -7,7 +7,7 @@ const dynamoClient = new DynamoDBClient({ region: "ap-south-1" });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const cognitoClient = new CognitoIdentityProviderClient({ region: "ap-south-1" });
 
-const TABLE_NAME = "NoteStack-Notes";
+const TABLE_NAME = process.env.NOTES_TABLE || "NoteStack-Notes";
 const USER_POOL_ID = process.env.USER_POOL_ID || "ap-south-1_EM3m76UWV";
 
 // Cache user emails to avoid repeated Cognito lookups
@@ -55,7 +55,7 @@ export async function handler(event) {
       exprNames["#cat"] = "category";
     }
 
-    // Don't filter search in DynamoDB — do it in-memory for case-insensitive matching
+    // Don't filter search in DynamoDB â€” do it in-memory for case-insensitive matching
     if (filterParts.length > 0) {
       params.FilterExpression = filterParts.join(" AND ");
       params.ExpressionAttributeValues = exprValues;
