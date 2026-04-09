@@ -51,7 +51,7 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
           borderRadius: '6px 2px 8px 4px',
           boxShadow: 'var(--shadow-sm)',
           background: avatarColor,
-          fontFamily: 'var(--font-hand)',
+          fontFamily: 'var(--font-body)',
           color: 'var(--ink)',
         }}
       >
@@ -68,12 +68,12 @@ export default function ProfileSection({ onLogout }: ProfileSectionProps) {
             <div className="flex items-center gap-3">
               <div
                 className="w-12 h-12 border-[2px] border-[var(--border)] flex items-center justify-center text-xl font-bold"
-                style={{ borderRadius: '4px 8px 2px 10px', background: avatarColor, fontFamily: 'var(--font-hand)' }}
+                style={{ borderRadius: '4px 8px 2px 10px', background: avatarColor, fontFamily: 'var(--font-body)' }}
               >
                 {initial}
               </div>
               <div>
-                <p className="text-lg font-semibold leading-tight" style={{ fontFamily: 'var(--font-hand)' }}>
+                <p className="text-lg font-semibold leading-tight" style={{ fontFamily: 'var(--font-body)' }}>
                   {email.split('@')[0]}
                 </p>
                 <p className="text-xs" style={{ color: 'var(--ink-light)' }}>{email}</p>

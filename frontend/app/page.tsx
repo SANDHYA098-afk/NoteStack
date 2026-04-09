@@ -11,7 +11,6 @@ import Settings from './domains/settings/Settings';
 import NotificationBell from './domains/notifications/NotificationBell';
 import Sidebar from './shared/Sidebar';
 import ToastContainer from './shared/Toast';
-import FloatingDoodles from './shared/FloatingDoodles';
 
 type Page = 'feed' | 'my-notes' | 'profile' | 'settings';
 
@@ -64,7 +63,6 @@ export default function Home() {
   return (
     <>
       <ToastContainer />
-      <FloatingDoodles />
       <Sidebar
         currentPage={currentPage}
         onNavigate={(page) => { setCurrentPage(page); setShowNewNote(false); }}

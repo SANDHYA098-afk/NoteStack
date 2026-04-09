@@ -71,7 +71,14 @@
       "Bash(sed -i \"/functionName: 'NoteStack-/d\" cdk-stack.ts)",
       "Bash(sed -i \"/bucketName:/d\" cdk-stack.ts)",
       "Bash(sed -i \"/userPoolName:/d\" cdk-stack.ts)",
-      "Bash(sed -i \"/userPoolClientName:/d\" cdk-stack.ts)"
+      "Bash(sed -i \"/userPoolClientName:/d\" cdk-stack.ts)",
+      "Bash(find . -name \"*.tsx\" -exec sed -i \"s/var\\(--font-hand\\)/var\\(--font-body\\)/g\" {} \\\\;)",
+      "Bash(grep -v \"//\")",
+      "Bash(find . -name \"*.tsx\" -exec sed -i 's/className=\"input /className=\"doodle-input /g' {} \\\\;)",
+      "Bash(find . -name \"*.tsx\" -exec sed -i 's/className=\"input\"/className=\"doodle-input\"/g' {} \\\\;)",
+      "Bash(find . -name \"*.tsx\" -exec sed -i 's/ className=\"btn btn-primary/ className=\"btn-doodle btn-primary/g' {} \\\\;)",
+      "Bash(find . -name \"*.tsx\" -exec sed -i 's/ className=\"btn btn-secondary/ className=\"btn-doodle btn-outline/g' {} \\\\;)",
+      "Bash(find . -name \"*.tsx\" -exec sed -i 's/ className=\"btn btn-danger/ className=\"btn-doodle btn-danger/g' {} \\\\;)"
     ]
   }
 }

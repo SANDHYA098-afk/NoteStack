@@ -31,7 +31,7 @@ NoteStack is a **serverless student notes & file sharing platform** built on AWS
 ### UI Features
 | Feature | Description |
 |---|---|
-| **Doodle Design** | Hand-drawn borders, floating SVG doodles, sketchy animations |
+| **Doodle Design** | Hand-drawn borders, sketchy controls, and playful motion accents |
 | **Botanical Theme** | Green/lime color palette inspired by the watercolor book logo |
 | **Dual-Color Branding** | "Note" in green + "Stack" in ink |
 | **Responsive** | Mobile-first design, collapsible sidebar |
@@ -39,7 +39,6 @@ NoteStack is a **serverless student notes & file sharing platform** built on AWS
 | **Toast Notifications** | Success/error/info popups with auto-dismiss |
 | **Skeleton Loading** | Shimmer loading states while data fetches |
 | **Password Toggle** | Show/hide password with eye icon |
-| **Floating Doodles** | Animated SVG stars, circles, hearts, spirals across all pages |
 
 ---
 
@@ -50,7 +49,7 @@ NoteStack is a **serverless student notes & file sharing platform** built on AWS
 - Tab switching between Login and Sign Up
 - Inline verification — after signup, code input appears in same view
 - Auto-login after successful verification
-- Floating doodle decorations visible on all screen sizes
+- Clean split-screen layout without floating decorative overlays
 - Light mode: `book2.png` illustration; Dark mode: `bookimg.png`
 
 ### 2. Community Feed (Home)
@@ -78,7 +77,7 @@ NoteStack is a **serverless student notes & file sharing platform** built on AWS
 
 ### 5. Settings
 - Account info (email, auth provider)
-- Dark/Light theme toggle with doodle-style switch
+- Dark/Light theme toggle with a compact pill switch
 - Notification info
 - Storage info (allowed file types, auto-delete policy)
 
@@ -234,7 +233,7 @@ EventBridge (daily) ──→ AutoDeleteOldNotes Lambda ──→ DynamoDB + S3 
 |---|---|
 | Frontend | Next.js 16.2.2, React 19, TypeScript, Tailwind CSS v4 |
 | Fonts | Caveat (handwritten display), Patrick Hand (body) |
-| Design | Doodle/botanical theme, 25+ custom SVG icons, floating animations |
+| Design | Doodle/botanical theme with hand-drawn controls and 25+ custom SVG icons |
 | Auth | Amazon Cognito (direct fetch, no SDK) |
 | API | Amazon API Gateway (REST) |
 | Backend | AWS Lambda (Node.js 18.x, ES Modules) — 14 functions |
@@ -299,10 +298,9 @@ NoteStack/
 │       │   ├── Sidebar.tsx           # Collapsible navigation
 │       │   ├── Toast.tsx             # Toast notifications
 │       │   ├── Modal.tsx             # Reusable modal
-│       │   ├── FloatingDoodles.tsx   # Animated SVG decorations
 │       │   ├── PasswordInput.tsx     # Password with show/hide
 │       │   └── icons/Icons.tsx       # 25+ custom SVG icons
-│       ├── globals.css               # Theme, animations, doodle styles
+│       ├── globals.css               # Theme, animations, doodle-inspired styles
 │       ├── layout.tsx                # Root layout + fonts
 │       └── page.tsx                  # Entry point + routing
 └── docs/

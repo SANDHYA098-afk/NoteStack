@@ -254,6 +254,7 @@ export class NoteStackCdkStack extends cdk.Stack {
     // ========================================================================
 
     new events.Rule(this, 'AutoDeleteRule', {
+      ruleName: 'NoteStack-AutoDelete',
       schedule: events.Schedule.rate(cdk.Duration.days(1)),
       targets: [new targets.LambdaFunction(autoDeleteFn)],
     });
@@ -263,6 +264,7 @@ export class NoteStackCdkStack extends cdk.Stack {
     // ========================================================================
 
     const api = new apigateway.RestApi(this, 'Api', {
+      restApiName: 'NoteStack-API',
       deployOptions: {
         stageName: 'dev',
       },
@@ -276,6 +278,7 @@ export class NoteStackCdkStack extends cdk.Stack {
     // Cognito Authorizer
     const authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuth', {
       cognitoUserPools: [userPool],
+      authorizerName: 'NoteStack-CognitoAuth',
     });
 
     const authOptions: apigateway.MethodOptions = {

@@ -16,133 +16,56 @@ export default function Profile() {
   const email = getUserEmail() || 'student';
   const name = username || email.split('@')[0];
   const initial = name.charAt(0).toUpperCase();
-
-  const avatarColors = ['#ff6b9d', '#4ecdc4', '#a8e06c', '#ff8a5c', '#b57bee', '#ffe156'];
-  const colorIndex = name.charCodeAt(0) % avatarColors.length;
+  const colors = ['#4a9e3f', '#3d8eb9', '#cc6d3d', '#d94848', '#7b5ea7', '#d4a030'];
+  const colorIdx = name.charCodeAt(0) % colors.length;
 
   useEffect(() => {
     loadNotes();
-    const savedName = localStorage.getItem('notestack-username');
-    if (savedName) setUsername(savedName);
+    const s = localStorage.getItem('notestack-username');
+    if (s) setUsername(s);
   }, []);
 
-  async function loadNotes() {
-    setLoading(true);
-    try { const data = await getNotes(); setNotes(data.notes); }
-    catch { /* silent */ }
-    finally { setLoading(false); }
-  }
-
-  async function handleDownload(fileKey: string) {
-    try { const data = await getDownloadUrl(fileKey); window.open(data.downloadUrl, '_blank'); }
-    catch (err: unknown) { showToast((err as Error).message, 'error'); }
-  }
-
-  function saveUsername(newName: string) {
-    setUsername(newName);
-    localStorage.setItem('notestack-username', newName);
-    setEditingName(false);
-    showToast('Username updated!', 'success');
-  }
-
+  async function loadNotes() { setLoading(true); try { const d = await getNotes(); setNotes(d.notes); } catch {} finally { setLoading(false); } }
+  async function handleDownload(fileKey: string) { try { const d = await getDownloadUrl(fileKey); window.open(d.downloadUrl, '_blank'); } catch (e: unknown) { showToast((e as Error).message, 'error'); } }
+  function saveUsername(v: string) { setUsername(v); localStorage.setItem('notestack-username', v); setEditingName(false); showToast('Username updated', 'success'); }
 
   const categories = [...new Set(notes.map(n => n.category))];
   const filesCount = notes.filter(n => n.fileKey).length;
 
   return (
-    <div className="relative z-10">
-      {/* Profile Header */}
-      <div
-        className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 sm:p-8 mb-8 animate-fade-up"
-        style={{ borderRadius: '8px 16px 6px 20px', boxShadow: 'var(--shadow)' }}
-      >
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          {/* Avatar with picture upload */}
-          <div
-            className="w-28 h-28 sm:w-32 sm:h-32 border-[3px] border-[var(--border)] flex items-center justify-center text-5xl font-bold shrink-0"
-            style={{ borderRadius: '16px', background: avatarColors[colorIndex], boxShadow: 'var(--shadow)', fontFamily: 'var(--font-hand)', color: 'var(--ink)' }}
-          >
-            {initial}
-          </div>
-
-          {/* Info */}
+    <div>
+      <div className="bg-[var(--bg-card)] border border-[var(--border)] p-6 sm:p-8 mb-6 animate-fade-up" style={{ borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shrink-0" style={{ background: colors[colorIdx] }}>{initial}</div>
           <div className="text-center sm:text-left flex-1">
             {editingName ? (
-              <div className="flex items-center gap-2 mb-2">
-                <input
-                  type="text"
-                  defaultValue={name}
-                  autoFocus
-                  className="doodle-input text-2xl !py-1"
-                  style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, maxWidth: '250px' }}
-                  onKeyDown={e => { if (e.key === 'Enter') saveUsername((e.target as HTMLInputElement).value); if (e.key === 'Escape') setEditingName(false); }}
-                  onBlur={e => saveUsername(e.target.value)}
-                />
-              </div>
+              <input type="text" defaultValue={name} autoFocus className="doodle-input text-xl font-bold !py-1 mb-1" style={{ maxWidth: '250px' }}
+                onKeyDown={e => { if (e.key === 'Enter') saveUsername((e.target as HTMLInputElement).value); if (e.key === 'Escape') setEditingName(false); }}
+                onBlur={e => saveUsername(e.target.value)} />
             ) : (
               <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
-                <h1 className="text-3xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700, color: 'var(--ink)' }}>{name}</h1>
-                <button onClick={() => setEditingName(true)} className="opacity-50 hover:opacity-100 transition-opacity" title="Edit username">
-                  <IconEdit size={16} />
-                </button>
+                <h1 className="text-2xl font-bold">{name}</h1>
+                <button onClick={() => setEditingName(true)} className="text-[var(--ink-muted)] hover:text-[var(--ink)]"><IconEdit size={14} /></button>
               </div>
             )}
-            <p className="text-sm mb-4" style={{ color: 'var(--ink-light)' }}>{email}</p>
-
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center sm:justify-start gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 border-[2px] border-[var(--border)] bg-[var(--yellow)]/20" style={{ borderRadius: '4px 8px 2px 6px' }}>
-                <IconNotes size={15} style={{ color: 'var(--ink)' }} />
-                <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }}>{notes.length} notes</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 border-[2px] border-[var(--border)] bg-[var(--blue)]/15" style={{ borderRadius: '2px 6px 4px 8px' }}>
-                <IconFile size={15} style={{ color: 'var(--ink)' }} />
-                <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }}>{filesCount} files</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 border-[2px] border-[var(--border)] bg-[var(--lime)]/20" style={{ borderRadius: '4px 2px 8px 4px' }}>
-                <IconTag size={15} style={{ color: 'var(--ink)' }} />
-                <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }}>{categories.length} categories</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 border-[2px] border-[var(--border)] bg-[var(--pink)]/15" style={{ borderRadius: '6px 4px 2px 8px' }}>
-                <IconClock size={15} style={{ color: 'var(--ink)' }} />
-                <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: 'var(--ink)' }}>Joined Apr 2026</span>
-              </div>
+            <p className="text-sm text-[var(--ink-muted)] mb-3">{email}</p>
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-[var(--accent-light)] text-[var(--accent)] rounded-full text-xs font-medium"><IconNotes size={12} />{notes.length} notes</span>
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-[var(--blue-light)] text-[var(--blue)] rounded-full text-xs font-medium"><IconFile size={12} />{filesCount} files</span>
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-[var(--purple-light)] text-[var(--purple)] rounded-full text-xs font-medium"><IconTag size={12} />{categories.length} categories</span>
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-[var(--warning-light)] text-[var(--warning)] rounded-full text-xs font-medium"><IconClock size={12} />Joined Apr 2026</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Published Notes */}
-      <h2 className="text-2xl mb-4 animate-fade-up" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600, color: 'var(--ink)', animationDelay: '0.1s' }}>
-        Published Notes
-      </h2>
+      <h2 className="text-lg font-semibold mb-3 animate-fade-up" style={{ animationDelay: '0.05s' }}>Published Notes</h2>
 
-      {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1,2,3].map(i => (
-            <div key={i} className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-5 animate-pulse" style={{ borderRadius: '6px 12px 4px 14px' }}>
-              <div className="h-5 w-3/5 bg-[var(--border-light)] rounded mb-3" />
-              <div className="h-3 w-full bg-[var(--border-light)] rounded mb-2" />
-              <div className="h-3 w-4/5 bg-[var(--border-light)] rounded" />
-            </div>
-          ))}
-        </div>
-      )}
+      {loading && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{[1,2,3].map(i => <div key={i} className="bg-[var(--bg-card)] border border-[var(--border)] p-4 animate-pulse" style={{ borderRadius: 'var(--radius)' }}><div className="h-4 w-3/5 bg-[var(--border)] rounded mb-2" /><div className="h-3 w-full bg-[var(--border)] rounded" /></div>)}</div>}
 
-      {!loading && notes.length === 0 && (
-        <div className="text-center py-12">
-          <IconNotes size={48} className="mx-auto mb-3 opacity-20" />
-          <p style={{ color: 'var(--ink-light)' }}>No notes published yet</p>
-        </div>
-      )}
+      {!loading && notes.length === 0 && <div className="text-center py-12"><IconNotes size={36} className="mx-auto mb-2" style={{ color: 'var(--ink-muted)', opacity: 0.3 }} /><p className="text-sm text-[var(--ink-muted)]">No notes published yet</p></div>}
 
-      {!loading && notes.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {notes.map((note, i) => (
-            <NoteCard key={note.noteId} note={note} index={i} showAuthor={false} isOwner={false} onDownload={handleDownload} />
-          ))}
-        </div>
-      )}
+      {!loading && notes.length > 0 && <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{notes.map((note, i) => <NoteCard key={note.noteId} note={note} index={i} showAuthor={false} isOwner={false} onDownload={handleDownload} />)}</div>}
     </div>
   );
 }

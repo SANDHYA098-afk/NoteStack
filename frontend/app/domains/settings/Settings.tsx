@@ -8,98 +8,47 @@ export default function Settings() {
   const [dark, setDark] = useState(false);
   const email = getUserEmail() || '';
 
-  useEffect(() => {
-    setDark(document.documentElement.getAttribute('data-theme') === 'dark');
-  }, []);
+  useEffect(() => { setDark(document.documentElement.getAttribute('data-theme') === 'dark'); }, []);
 
   function toggleTheme() {
-    const next = !dark;
-    setDark(next);
+    const next = !dark; setDark(next);
     document.documentElement.setAttribute('data-theme', next ? 'dark' : '');
     localStorage.setItem('theme', next ? 'dark' : 'light');
   }
 
   return (
     <div>
-      <h1 className="text-4xl mb-2 animate-fade-up" style={{ fontFamily: 'var(--font-hand)', fontWeight: 700 }}>Settings</h1>
-      <p className="text-base mb-8 animate-fade-up" style={{ color: 'var(--ink-light)', animationDelay: '0.05s' }}>Manage your account and preferences</p>
+      <h1 className="text-2xl font-bold mb-1 animate-fade-up">Settings</h1>
+      <p className="text-sm text-[var(--ink-muted)] mb-6 animate-fade-up">Manage your account and preferences</p>
 
-      <div className="space-y-4 max-w-2xl">
-        {/* Account */}
-        <div
-          className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 animate-fade-up"
-          style={{ borderRadius: '8px 14px 6px 16px', boxShadow: 'var(--shadow)', animationDelay: '0.1s' }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <IconUser size={20} />
-            <h2 className="text-xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Account</h2>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>Email</label>
-              <p className="text-base" style={{ fontFamily: 'var(--font-body)' }}>{email}</p>
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--ink-light)', fontFamily: 'var(--font-body)' }}>Auth Provider</label>
-              <p className="text-base" style={{ fontFamily: 'var(--font-body)' }}>Amazon Cognito</p>
-            </div>
+      <div className="space-y-3 max-w-2xl">
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] p-5 animate-fade-up" style={{ borderRadius: 'var(--radius)', animationDelay: '0.05s' }}>
+          <div className="flex items-center gap-2.5 mb-3"><IconUser size={18} className="text-[var(--ink-muted)]" /><h2 className="text-base font-semibold">Account</h2></div>
+          <div className="space-y-2 text-sm">
+            <div><span className="text-[var(--ink-muted)]">Email:</span> <span>{email}</span></div>
+            <div><span className="text-[var(--ink-muted)]">Auth:</span> <span>Amazon Cognito</span></div>
           </div>
         </div>
 
-        {/* Appearance */}
-        <div
-          className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 animate-fade-up"
-          style={{ borderRadius: '6px 16px 8px 14px', boxShadow: 'var(--shadow)', animationDelay: '0.15s' }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            {dark ? <IconMoon size={20} /> : <IconSun size={20} />}
-            <h2 className="text-xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Appearance</h2>
-          </div>
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] p-5 animate-fade-up" style={{ borderRadius: 'var(--radius)', animationDelay: '0.1s' }}>
+          <div className="flex items-center gap-2.5 mb-3">{dark ? <IconMoon size={18} className="text-[var(--ink-muted)]" /> : <IconSun size={18} className="text-[var(--ink-muted)]" />}<h2 className="text-base font-semibold">Appearance</h2></div>
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-base font-medium" style={{ fontFamily: 'var(--font-body)' }}>Dark Mode</p>
-              <p className="text-sm" style={{ color: 'var(--ink-light)' }}>Switch between light and dark theme</p>
-            </div>
-            <button
-              onClick={toggleTheme}
-              className="w-14 h-8 border-[2.5px] border-[var(--border)] relative cursor-pointer transition-colors"
-              style={{ borderRadius: '4px 8px 2px 6px', background: dark ? 'var(--blue)' : 'var(--border-light)' }}
-            >
-              <div
-                className="absolute top-[3px] w-5 h-5 bg-[var(--bg-card)] border-[2px] border-[var(--border)] transition-all duration-200"
-                style={{ borderRadius: '2px 4px 2px 4px', left: dark ? '26px' : '3px' }}
-              />
+            <div><p className="text-sm font-medium">Dark Mode</p><p className="text-xs text-[var(--ink-muted)]">Switch between light and dark</p></div>
+            <button onClick={toggleTheme} className="w-11 h-6 rounded-full relative transition-colors" style={{ background: dark ? 'var(--accent)' : 'var(--border)' }}>
+              <div className="absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm" style={{ left: dark ? '24px' : '4px' }} />
             </button>
           </div>
         </div>
 
-        {/* Notifications */}
-        <div
-          className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 animate-fade-up"
-          style={{ borderRadius: '8px 12px 6px 18px', boxShadow: 'var(--shadow)', animationDelay: '0.2s' }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <IconBell size={20} />
-            <h2 className="text-xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Notifications</h2>
-          </div>
-          <p className="text-sm" style={{ color: 'var(--ink-light)' }}>
-            In-app notifications are enabled. You receive alerts when someone creates a note or shares one with you. Notifications poll every 30 seconds.
-          </p>
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] p-5 animate-fade-up" style={{ borderRadius: 'var(--radius)', animationDelay: '0.15s' }}>
+          <div className="flex items-center gap-2.5 mb-3"><IconBell size={18} className="text-[var(--ink-muted)]" /><h2 className="text-base font-semibold">Notifications</h2></div>
+          <p className="text-sm text-[var(--ink-muted)]">In-app notifications are enabled. Polls every 30 seconds.</p>
         </div>
 
-        {/* Storage */}
-        <div
-          className="bg-[var(--bg-card)] border-[2.5px] border-[var(--border)] p-6 animate-fade-up"
-          style={{ borderRadius: '6px 14px 8px 12px', boxShadow: 'var(--shadow)', animationDelay: '0.25s' }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <IconFile size={20} />
-            <h2 className="text-xl" style={{ fontFamily: 'var(--font-hand)', fontWeight: 600 }}>Storage</h2>
-          </div>
-          <div className="space-y-2 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-            <p><span style={{ color: 'var(--ink-light)' }}>File Storage:</span> Amazon S3</p>
-            <p><span style={{ color: 'var(--ink-light)' }}>Allowed types:</span> PDF, PNG, JPG, JPEG</p>
-            <p><span style={{ color: 'var(--ink-light)' }}>Auto-delete:</span> Notes older than 30 days are cleaned up daily</p>
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] p-5 animate-fade-up" style={{ borderRadius: 'var(--radius)', animationDelay: '0.2s' }}>
+          <div className="flex items-center gap-2.5 mb-3"><IconFile size={18} className="text-[var(--ink-muted)]" /><h2 className="text-base font-semibold">Storage</h2></div>
+          <div className="space-y-1 text-sm text-[var(--ink-muted)]">
+            <p>File Storage: Amazon S3</p><p>Allowed: PDF, PNG, JPG, JPEG</p><p>Auto-delete: 30 days</p>
           </div>
         </div>
       </div>
