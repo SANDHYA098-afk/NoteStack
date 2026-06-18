@@ -17,11 +17,11 @@ NoteStack is a modern, collaborative platform designed for students to organize,
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React / Next.js
-- **Backend**: Serverless (AWS Lambda, Firebase, or similar)
-- **Database**: Cloud-based (DynamoDB, Firestore, MongoDB Atlas, etc.)
+- **Frontend**: Next.js
+- **Backend**: Serverless AWS Lambda
+- **Database**: DynamoDB
 - **Hosting**: Vercel
-- **Authentication**: OAuth / JWT
+- **Authentication**: AWS Cognito
 
 ## 🚀 Getting Started
 
